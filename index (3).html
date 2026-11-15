@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Preshith Win Peeter | Computer Science Student, Python & Web Development</title>
+<meta name="description" content="Preshith Win Peeter is a B.Tech CSE student at Joy University through NxtWave, working with Python, web development and AI tools. Open to internships and hackathons.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:image" content="https://preshith4.github.io/preshith.jpg">
+<style>
+:root{--ink:#2b1b3d;--card:rgba(255,248,240,.94);--accent:#ff6b3d}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:#f4a678;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+canvas{display:block;position:fixed;inset:0}
+#top{position:fixed;top:0;left:0;right:0;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:calc(10px + env(safe-area-inset-top)) 10px 0;z-index:5}
+#top button{border:0;border-radius:99px;padding:8px 14px;background:var(--card);color:var(--ink);font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px #0003}
+#top button:hover{background:var(--accent);color:#fff}
+#panel{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translate(-50%,30px);width:min(560px,calc(100% - 24px));max-height:46vh;overflow:auto;background:var(--card);border-radius:18px;padding:18px 20px;box-shadow:0 10px 40px #0005;opacity:0;pointer-events:none;transition:.35s;z-index:5}
+#panel.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#panel h2{font-size:22px;margin-bottom:6px}
+#panel p,#panel li{font-size:14.5px;line-height:1.5;margin:4px 0}
+#panel ul{padding-left:18px}
+#panel a{color:var(--accent);font-weight:600}
+#panel img{width:84px;height:84px;object-fit:cover;border-radius:50%;float:right;margin:0 0 8px 12px;border:3px solid var(--accent)}
+.chip{display:inline-block;background:#ffe3d3;border-radius:99px;padding:3px 11px;margin:3px 3px 0 0;font-size:13px;font-weight:600}
+#hint{position:fixed;top:56px;left:0;right:0;text-align:center;font-size:13px;color:#fff;text-shadow:0 1px 4px #0006;z-index:4;transition:opacity .6s;padding:0 10px}
+#pad{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));display:none;grid-template:repeat(2,54px)/repeat(3,54px);gap:6px;z-index:6}
+#pad button{border:0;border-radius:14px;background:#fff9;font-size:20px;color:var(--ink);touch-action:none}
+#pad button:active{background:var(--accent);color:#fff}
+@media(pointer:coarse){#pad{display:grid}#panel{max-height:34vh;bottom:calc(140px + env(safe-area-inset-bottom))}}
+#load{position:fixed;inset:0;display:grid;place-items:center;background:#f4a678;color:#fff;font-size:20px;font-weight:700;z-index:9;transition:opacity .6s}
+</style>
+</head>
+<body>
+<div id="load">Starting engine…</div>
+<div id="top"></div>
+<div id="hint">Drive with <b>W A S D</b> / arrow keys · <b>Shift</b> to boost · tap a button above to jump to a zone</div>
+<div id="panel"></div>
+<div id="pad"><span></span><button data-k="up">▲</button><span></span><button data-k="left">◀</button><button data-k="down">▼</button><button data-k="right">▶</button></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const ZONES=[
+ {z:0,t:"Hello, I'm Preshith",s:"Computer Science Student · Python & Web Development",
+  h:`<h2>Hi, I'm Preshith 👋</h2><p>B.Tech CSE student at <b>Joy University</b> through <b>NxtWave</b>. I work with Python, web development and AI tools.</p><p><span class="chip">Open to internships</span><span class="chip">Open to hackathons</span></p><p>Keep driving forward to explore my world →</p>`},
+ {z:-90,t:"About",s:"Who I am",
+  h:`<img src="preshith.jpg" alt="Portrait of Preshith Win Peeter" onerror="this.remove()"><h2>About</h2><p>I started my B.Tech in Computer Science and Engineering in 2026 and I'm building strong foundations in Python and web development, using AI tools like Claude and ChatGPT along the way.</p><p><b>Languages:</b> Tamil, English<br><b>Based in:</b> Kanniyakumari District, Tamil Nadu, India</p><ul><li>2026 · Started B.Tech CSE at Joy University</li><li>Sep 2026 · Published Python practice work on GitHub</li></ul>`},
+ {z:-180,t:"Study",s:"Where I learn",
+  h:`<h2>Study</h2><p><b>B.Tech in Computer Science and Engineering</b></p><ul><li>University: Joy University</li><li>Program with: NxtWave</li><li>Started: 2026</li></ul>`},
+ {z:-270,t:"The Skill Zone",s:"What I use",
+  h:`<h2>The Skill Zone</h2><p><b>Building</b></p><p><span class="chip">Python</span><span class="chip">Web development</span></p><p><b>AI tools</b></p><p><span class="chip">Claude</span><span class="chip">ChatGPT</span><span class="chip">Prompt writing</span></p>`},
+ {z:-360,t:"Projects",s:"Things I've made",
+  h:`<h2>Projects</h2><p><b>home-work</b> · Five Python files of practice exercises, working through the basics step by step.</p><ul><li><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work/blob/main/project1.py">project1.py</a> · Printing text</li><li><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work/blob/main/project2.py">project2.py</a> · Arithmetic</li><li><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work/blob/main/project3.py">project3.py</a> · Variables</li><li><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work/blob/main/project4.py">project4.py</a> · Data types</li><li><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work/blob/main/project5.py">project5.py</a> · Program order</li></ul><p><a target="_blank" rel="noopener" href="https://github.com/preshith4/home-work">View on GitHub →</a></p>`},
+ {z:-450,t:"Contact",s:"Let's talk",
+  h:`<h2>Contact</h2><p>Open to internships and hackathons.</p><p><a href="mailto:preshith4@gmail.com">preshith4@gmail.com</a></p><p><a target="_blank" rel="noopener" href="https://www.linkedin.com/in/preshith-4-13b11744">LinkedIn</a> · <a target="_blank" rel="noopener" href="https://www.instagram.com/hyy.preshith">Instagram</a> · <a target="_blank" rel="noopener" href="https://github.com/preshith4">GitHub</a></p><p style="opacity:.6;font-size:12px">© 2026 Preshith Win Peeter · B.Tech CSE, Joy University</p>`}
+];
+
+const R=new THREE.WebGLRenderer({antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);
+document.body.prepend(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(0xf6a77a);S.fog=new THREE.Fog(0xf6a77a,40,230);
+const C=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,400);
+S.add(new THREE.HemisphereLight(0xffe2c8,0x8a5a7a,.95));
+const sun=new THREE.DirectionalLight(0xffd0a0,.9);sun.position.set(-40,60,-60);S.add(sun);
+const M=(c)=>new THREE.MeshLambertMaterial({color:c,flatShading:true});
+function box(w,h,d,c,x,y,z,p){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);(p||S).add(m);return m}
+
+// ground + road
+const g=new THREE.Mesh(new THREE.PlaneGeometry(400,1200),M(0xe8b88f));g.rotation.x=-Math.PI/2;g.position.set(0,0,-250);S.add(g);
+box(16,.1,1200,0x5b4a6b,0,.05,-250);
+for(let z=60;z>-520;z-=8)box(.4,.12,3,0xffe9c4,0,.1,z);
+// sun
+const sm=new THREE.Mesh(new THREE.SphereGeometry(30,24,16),new THREE.MeshBasicMaterial({color:0xfff0b8,fog:false}));sm.position.set(-80,60,-380);S.add(sm);
+
+// buildings
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const pal=[0xff8f6b,0xffc27a,0xd98aa8,0x9b7fc4,0xf2dcc0,0x6fa3c9];
+for(let z=70;z>-520;z-=9)for(const sd of[-1,1]){
+  if(rnd()<.2)continue;const w=6+rnd()*6,h=6+rnd()*22,x=sd*(16+rnd()*14+w/2);
+  const b=box(w,h,7+rnd()*3,pal[(rnd()*pal.length)|0],x,h/2,z);
+  box(w+.6,.8,8,0xfff1de,x,h,z);
+}
+// trees
+for(let i=0;i<90;i++){const x=(rnd()<.5?-1:1)*(12+rnd()*60),z=60-rnd()*560,t=new THREE.Group();
+  box(.6,2,.6,0x7a4a3a,0,1,0,t);const l=new THREE.Mesh(new THREE.ConeGeometry(2.2,5,6),M(rnd()<.5?0x6fae7a:0x9bc77a));l.position.y=4.5;t.add(l);t.position.set(x,0,z);S.add(t)}
+// clouds
+for(let i=0;i<22;i++){const c=new THREE.Group();for(let j=0;j<4;j++){const s=new THREE.Mesh(new THREE.SphereGeometry(5+rnd()*4,8,6),new THREE.MeshBasicMaterial({color:0xfff4ea}));s.position.set(j*6,rnd()*2,rnd()*3);c.add(s)}
+  c.position.set((rnd()-.5)*300,40+rnd()*30,60-rnd()*560);S.add(c)}
+// landmark tower at end
+for(let i=0;i<6;i++){const r=9-i*1.4;const m=new THREE.Mesh(new THREE.CylinderGeometry(r*.8,r,12,4),M(0xc5522f));m.position.set(0,6+i*11,-520);m.rotation.y=Math.PI/4;S.add(m)}
+
+// sign canvas
+function sign(t,s){const c=document.createElement('canvas');c.width=1024;c.height=300;const x=c.getContext('2d');
+  x.fillStyle='#2b1b3d';x.fillRect(0,0,1024,300);x.fillStyle='#ff6b3d';x.fillRect(0,0,1024,14);x.fillRect(0,286,1024,14);
+  x.textAlign='center';x.fillStyle='#fff3e6';x.font='bold 96px system-ui,sans-serif';x.fillText(t,512,150);
+  x.fillStyle='#ffc27a';x.font='42px system-ui,sans-serif';x.fillText(s,512,225);
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(20,5.86),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));return m}
+ZONES.forEach((zn,i)=>{
+  box(1.2,12,1.2,0xfff1de,-9,6,zn.z);box(1.2,12,1.2,0xfff1de,9,6,zn.z);box(20,1,1.6,0xff6b3d,0,12.2,zn.z);
+  const sg=sign(zn.t,zn.s);sg.position.set(0,15.5,zn.z+.1);S.add(sg);
+  const sb=sign(zn.t,zn.s);sb.position.set(0,15.5,zn.z-.1);sb.rotation.y=Math.PI;S.add(sb);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(5,6,32),new THREE.MeshBasicMaterial({color:0xfff0b8,side:2}));ring.rotation.x=-Math.PI/2;ring.position.set(0,.2,zn.z);S.add(ring);
+  const b=document.createElement('button');b.textContent=i?zn.t.replace('The ',''):'Home';b.onclick=()=>{P.x=0;P.z=zn.z+14;P.h=0;P.v=0};document.getElementById('top').appendChild(b)});
+
+// scooter
+const P={x:0,z:20,h:0,v:0,lean:0};
+const sc=new THREE.Group();
+box(.9,.25,3,0xffc42e,0,.7,0,sc);box(.5,1.2,.5,0xffc42e,0,1.2,-1.4,sc);box(1.6,.15,.2,0x2b1b3d,0,1.85,-1.4,sc);
+const wh=[];for(const z of[-1.3,1.2]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,.3,12),M(0x2b1b3d));w.rotation.z=Math.PI/2;w.position.set(0,.5,z);sc.add(w);wh.push(w)}
+box(.8,1.3,.6,0x2b8fd9,0,1.6,.3,sc);const hd=new THREE.Mesh(new THREE.SphereGeometry(.4,10,8),M(0xf2c9a0));hd.position.set(0,2.5,.3);sc.add(hd);box(.9,.3,.9,0xff6b3d,0,2.8,.3,sc);
+const rig=new THREE.Group();rig.add(sc);S.add(rig);
+
+// input
+const K={};addEventListener('keydown',e=>{K[e.key.toLowerCase()]=1;if(e.key.startsWith('Arrow'))e.preventDefault()});addEventListener('keyup',e=>K[e.key.toLowerCase()]=0);
+document.querySelectorAll('#pad button').forEach(b=>{const k=b.dataset.k;['pointerdown'].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();K[k]=1}));['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>K[k]=0))});
+const on=(a,b)=>K[a]||K[b];
+
+const panel=document.getElementById('panel'),hint=document.getElementById('hint');let cur=-1,clk=new THREE.Clock();
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clk.getDelta(),.05);
+  const fw=on('w','arrowup')||K.up,bk=on('s','arrowdown')||K.down,lf=on('a','arrowleft')||K.left,rt=on('d','arrowright')||K.right,boost=K.shift?1.8:1;
+  if(fw)P.v+=30*dt*boost;if(bk)P.v-=26*dt;P.v*=1-1.6*dt;P.v=Math.max(-14,Math.min(34*boost,P.v));
+  const st=(lf?1:0)-(rt?1:0);P.h+=st*1.9*dt*Math.min(1,Math.abs(P.v)/6)*(P.v<0?-1:1);
+  P.x-=Math.sin(P.h)*P.v*dt;P.z-=Math.cos(P.h)*P.v*dt;P.x=Math.max(-60,Math.min(60,P.x));P.z=Math.max(-540,Math.min(70,P.z));
+  P.lean+=(st*.35*Math.min(1,Math.abs(P.v)/10)-P.lean)*6*dt;
+  rig.position.set(P.x,0,P.z);rig.rotation.y=P.h;sc.rotation.z=P.lean;wh.forEach(w=>w.rotation.x+=P.v*dt*2);
+  const cp=new THREE.Vector3(P.x+Math.sin(P.h)*11,6.5,P.z+Math.cos(P.h)*11);C.position.lerp(cp,Math.min(1,4*dt));
+  C.lookAt(P.x-Math.sin(P.h)*8,2,P.z-Math.cos(P.h)*8);
+  let n=-1;ZONES.forEach((zn,i)=>{if(Math.abs(P.z-zn.z)<14&&Math.abs(P.x)<30)n=i});
+  if(n!==cur){cur=n;if(n>=0){panel.innerHTML=ZONES[n].h;panel.classList.add('on');hint.style.opacity=0}else panel.classList.remove('on')}
+  R.render(S,C)}
+addEventListener('resize',()=>{R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()});
+C.position.set(0,6.5,31);loop();
+setTimeout(()=>{const l=document.getElementById('load');l.style.opacity=0;setTimeout(()=>l.remove(),700)},500);
+})();
+</script>
+</body>
+</html>
